@@ -11,8 +11,8 @@ import requests
 import sqlalchemy
 import mysql
 try:
-    db = pymysql.connect("localhost", "root", "zancompute", "Analytics")
-    dbe = pymysql.connect("db-read.zancompute.com", "zanprduser", "Atla$19ZC", "MasterDB")
+    db = pymysql.connect("localhost", "root", "*******", "Analytics")
+    dbe = pymysql.connect("db-read.*******.com", "********", "*******", "MasterDB")
 except:
     print("data base connection error")
 a = None
