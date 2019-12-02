@@ -1,7 +1,7 @@
 fetch_stream.py file has define functions for generate cleanliness_index which builded based generic Robotics Process Automation for Machine Learning Approaches.
 
 Cleanliness_index_stream file has complete code for generate cleanliness_index for smart washrooms. 
-This file will genarating cleanliness_index at each half hour period in streamline. It's a automatic process which will run within 2 seconds using RPA architecture.
+This file will genarating cleanliness_index at each half hour period in streamline. It's a automatic process which will run within 2 seconds using Automatic Data Integration architecture.
 
 
 
