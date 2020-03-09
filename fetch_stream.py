@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from time import gmtime, strftime
 import sqlalchemy
 import mysql
+
 def paper_clean(gh):
     df_pl=gh[(gh.deviceName.str.contains("PaperTowel")) |(gh.deviceName.str.contains("ToiletPaper")) ]
     #b['Time']=b['Time'].astype(str)
@@ -18,8 +19,6 @@ def paper_clean(gh):
     a['difference']=np.where(a.difference < -20 ,1,a.difference)
     a['Smoothed_values']=np.where(a.difference < 0,a.value.shift(1),a.value)
     return a
-
-
 
 
 def date_time_operation(df):
@@ -57,18 +56,19 @@ def Paper_Prepare_Stream(Final,Final_1,R,e_date_time):
     rk=None
     rk=ghk.sort_values(['client_id','area_id','device_id','date','date_time'],ascending=True)
     rk.reset_index(inplace=True)
-    rk=rk.sort_values(['device_id'],ascending=True)
-    rk['difference'] = rk.groupby('device_id')['raw_value'].diff(1) * (-1)
+    rk=rk.sort_values(['area_id','device_id'],ascending=True)
+    rk['difference'] = rk.groupby(['area_id','device_id'])['raw_value'].diff(1) * (-1)
     rk['difference']=np.where(rk.difference < -20 ,1,rk.difference)
-    rk['smoothed_value']=np.where(rk.difference < 0,rk.raw_value.shift(1),rk.raw_value)
+    rk['smoothed_value']=np.where(rk.raw_value<0,rk.raw_value.shift(1),rk.raw_value)
+    rk['smoothed_value']=np.where((rk.difference <0),rk.smoothed_value.shift(1),rk.smoothed_value)
     rk['smoothed_value']=np.where(rk.smoothed_value == 255,rk.smoothed_value.shift(1),rk.smoothed_value)
-    rk['Lag1_Replacement'] =rk.groupby('device_id')['smoothed_value'].shift(-1)
+    rk['Lag1_Replacement'] =rk.groupby(['area_id','device_id'])['smoothed_value'].shift(-1)
     a1 = rk['smoothed_value']/100
     a2 = rk['Lag1_Replacement']/100
     r = 6.5
     rk['formula_usage'] = (a1 - a2)*((2*r+(a1+a2)*R))*100/(2*r+R)
     rk['formula_usage'] = np.where(rk['formula_usage']<-20, 0, rk.formula_usage)
-    rk['usage']=rk.groupby('device_id')['formula_usage'].shift(1)
+    rk['usage']=rk.groupby(['area_id','device_id'])['formula_usage'].shift(1)
     rk=rk[['client_id', 'area_id', 'device_id', 'date_time', 'date', 'period_type','period', 'raw_value', 'smoothed_value', 'usage', 'created_date']]
     rkl=rk[(rk.date_time == e_date_time)]
     return rkl
@@ -99,18 +99,21 @@ def Usage_Calculation(Final,Final_1):
     Rff.columns=['client_id','area_id', 'device_id', 'date_time', 'date', 'hour', 'raw_value','smoothed_value', 'usage', 'created_date']
     return Rff
 
+
 def Trash_Prepare_Stream(Final,Final_1,e_date_time):
     ghk=pd.concat([Final,Final_1],axis=0)
     rk=None
     rk=ghk.sort_values(['client_id','area_id','device_id','date','date_time'],ascending=True)
     rk.reset_index(inplace=True)
-    rk['difference'] = rk.groupby('device_id')['raw_value'].diff(1) * (-1)
-    rk['smoothed_value']=np.where((rk.difference <= 20)&(rk.difference >0) ,rk.raw_value.shift(+1),rk.raw_value)
-    rk['difference'] = rk.groupby('device_id')['smoothed_value'].diff(1) * (1)
+    rk['difference'] = rk.groupby(['area_id','device_id'])['raw_value'].diff(1) * (-1)
+    rk['smoothed_value']=np.where((rk.raw_value<0),rk.raw_value.shift(+1),rk.raw_value)
+    rk['smoothed_value']=np.where((rk.difference <= 20)&(rk.difference >0) ,rk.smoothed_value.shift(+1),rk.smoothed_value)
+    rk['difference'] = rk.groupby(['area_id','device_id'])['smoothed_value'].diff(1) * (1)
     rk['usage']=np.where(rk.difference <-20 ,rk.smoothed_value,rk.difference)
     rk=rk[['client_id', 'area_id', 'device_id', 'date_time', 'date', 'period_type','period', 'raw_value', 'smoothed_value', 'usage', 'created_date']]
     rkl=rk[(rk.date_time == e_date_time)]
     return rkl
+
 
 def Trash_Half_Hour_Calc(Final,s_hour):
     new=Final['Time'].str.split(":",expand=True)
@@ -128,6 +131,7 @@ def Trash_Half_Hour_Calc(Final,s_hour):
         Final['Time']=Final['Time'].str.replace(""+s_hour+"",k)
     Final['date_time']=Final['Date']+" "+Final['Time']
     return Final
+
 
 def Trash_Half_Hour_Data_Preparation(Final,Final_1):
     Final_2=Final_1.groupby(['client_id', 'area_id', 'device_id','date', 'hour'])['date_time','raw_value'].last()
@@ -150,12 +154,14 @@ def hrly_Toilet_Usage(output):
     Toilet_Usage['created_date']=pd.to_datetime('now').replace(microsecond=0)
     return Toilet_Usage
 
+
 def hrly_Paper_Usage(output):
     Paper_Usage=pd.DataFrame(output.groupby(['client_id','area_id','date','hour'])['usage'].sum())
     Paper_Usage.reset_index(inplace=True)
     Paper_Usage.columns=['client_id', 'area_id', 'date', 'hour', 'Paper_usage']
     Paper_Usage['created_date']=pd.to_datetime('now').replace(microsecond=0)
     return Paper_Usage
+
 
 def hrly_Washbasin_Usage(output):
     Wash_Usage=pd.DataFrame(output.groupby(['client_id','area_id','date','hour'])['water_usage','traffic_count'].sum())
@@ -164,14 +170,16 @@ def hrly_Washbasin_Usage(output):
     Wash_Usage['created_date']=pd.to_datetime('now').replace(microsecond=0)
     return Wash_Usage
 
+
 def DataBase_Connection():
-    database_username = 'root'
-    database_password = 'zancompute'
-    database_ip       = 'localhost'
-    database_name     = 'Analytics'
+    database_username = '***'
+    database_password = '****'
+    database_ip       = '****'
+    database_name     = '****'
     database_connection = sqlalchemy.create_engine('mysql+mysqlconnector://{0}:{1}@{2}/{3}'.format(database_username, database_password, database_ip, database_name))
     return database_connection
     
+
 def get_period(dt):
     hh = int(dt.split(":")[0])
     jj= int(dt.split(":")[1])
@@ -194,6 +202,8 @@ def get_period(dt):
             dl.append(added)
     return dl
 
+
+
 def PCA_loading_factor_half_hour(Final,loading_Factor):
     lf_toilet=loading_Factor[(loading_Factor.device_type.str.contains('toiletPaper'))]
     lf_paper=loading_Factor[(loading_Factor.device_type.str.contains('paperTowel'))]
@@ -212,6 +222,8 @@ def PCA_loading_factor_half_hour(Final,loading_Factor):
     Final_=Final[['processing_id','client_id', 'area_id','date', 'date_time','period_type','period','scoring','unclealiness_index', 'created_date']]
     return Final_
 
+
+
 def weekday_assign(dt_client):
     current_date=dt_client.timetuple()
     weekday=pd.DataFrame(np.arange(0,7),columns=['day']).astype(str)
@@ -225,6 +237,8 @@ def weekday_assign(dt_client):
     weekdays=weekday.T
     weekdays.reset_index(inplace=True)
     return weekdays
+
+
 def traffic_usage_lag(traffic_4,Paper_1):    
     traffic_4['traffic_count']=traffic_4['traffic_count'].astype(float)
     traffic_lag_=pd.DataFrame(traffic_4.groupby(['period'])['traffic_count'].sum()).T
@@ -254,6 +268,8 @@ def traffic_usage_lag(traffic_4,Paper_1):
         usage_lag['lag4']=0
     usage_lag.reset_index(inplace=True)
     return traffic_lag_,usage_lag
+
+
 def period_assign(period):
     period_=pd.DataFrame(np.arange(0,48),columns=['period']).astype(str)
     period_['pe']='period'
@@ -266,6 +282,8 @@ def period_assign(period):
     period_type=period_.T
     period_type.reset_index(inplace=True)
     return period_type
+
+
 def time_formation(pd):
     new=pd.split(" ")
     k=new[1]
