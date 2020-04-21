@@ -370,7 +370,7 @@ class CI_Calculation(object):
                         Forecast_cleanliness_index['unclealiness_index']=25
                         print('device Alert')
                     else:
-                        print("No Device Alert")
+                        print("No Device alert on this")
                     Forecast_cleanliness_index.to_sql(con=db_con, name='forecast_uncleanliness_index', if_exists='append',index=False)
                 except Exception as ex:
                     logger.error("Forecast Cleaning Error: "+areaId+"".format(str(ex)))   
