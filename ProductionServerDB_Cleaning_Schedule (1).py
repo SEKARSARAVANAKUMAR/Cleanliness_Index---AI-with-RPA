@@ -23,7 +23,6 @@ def main():
     dateDifference = start - end
     dateDifference = dateDifference.days
     db = pymysql.connect("****", "****", "****", "****")
-    #db = pymysql.connect("localhost", "root", "zancompute", "MasterDB");
     cursor = db.cursor()
     print("DB connected")
     QueryTogetDbNamesFromMasterDB ="select distinct dbName from client_details where dbName in('cisco');"
@@ -38,7 +37,6 @@ def main():
         hourBetweenStart = 0 
         hourBetweenEnd = 23
         db = pymysql.connect("db-write.zancompute.com", "zanprduser", "Atla$19ZC", client)
-        #db = pymysql.connect("localhost", "root", "zancompute", client);
         cursor = db.cursor()
         print(client)
         QueryToCheckWeekEndsEnabled = "select analyticsWeekEndRestrictionFlag from MasterDB.client_details where  dbName='"+client+"';"
