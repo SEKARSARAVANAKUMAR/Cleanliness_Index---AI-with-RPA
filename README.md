@@ -1,4 +1,8 @@
-This file will genarating cleanliness_index at each half hour period in streamline. It's a automatic process which will run 10k devices data within 1.2 seconds using Seamless Enhancement Process Engineering architecture.
+Python, SQL, PCA, Linear Regression, Transformation, Optimization, Alert Configuration.
+
+The Cleanliness Index is the overall status of the material components. That tracks the material status of IoT devices and informs to Janitors for cleaning the restroom and optimally replenishes the materials using the CI. Cleanliness Index performs in an optimum way using the threshold value arrived by the history of CI.
+
+It's genarating cleanliness_index at each half hour once. It's a automatic process which will take 10k devices data and process that within 1.12 seconds using Seamless Enhancement Process Engineering architecture.
 
 
 
