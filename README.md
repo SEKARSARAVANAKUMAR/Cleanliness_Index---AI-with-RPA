@@ -1,36 +1,10 @@
-Python, SQL, PCA, Linear Regression, Transformation, Optimization, Alert Configuration.
+Smart Facility Management Services will provide AI-enabled valued added services help to improve the business quality's with conginitve inputs. We can raise the funds using this projects and products. 
 
-The Cleanliness Index is the overall status of the material components. That tracks the material status of IoT devices and informs to Janitors for cleaning the restroom and optimally replenishes the materials using the CI. Cleanliness Index performs in an optimum way using the threshold value arrived by the history of CI.
+Let me know any queries/clarifications.
 
-It's genarating cleanliness_index at each half hour once. It's a automatic process which will take 10k devices data and process that within 1.12 seconds using Seamless Enhancement Process Engineering architecture.
-
-
-
-Processing Steps:
-PROCESS 1:
-Fetching Sensor percentage or value ,AreaName , AreaId , DeviceId, DeviceName, SensorId, SensorName from DEVICE STATUS Table in Production Database for Paper Towel, Toilet Paper, Trash, People Count with respect to every half an hour period . In case of Washbasin, the data is collected for every one hour period. And also fetching loading factors for calculating cleanliness index from UNCLEANLINESS FACTOR table in Test Server Database. 
-PROCESS 2:
-	The collected data is processed using various operations like date time operations, Smoothing algorithm, Usage calculation, Data loss finder and Usage gap distribution for data formation. There are separate Python script will run for each device type. The formatted data will get posted in individual tables for each device type in the Test Database. 
-PROCESS 3:
-	The formatted data will generate Cleanliness Index using loading factors. The calculated Cleanliness index is posted in the Test Server Database. 
-PROCESS 4:
-	The posted last five period formatted data will be collected on residing tables with coefficient data from LM COEFFICIENT table from the Test server’s which is further used for forecasting usages and traffic count using ML layer. The forecasted usages and traffic is posted in FORECASTED table in the Test Server Database.
-Process 5:
-          The forecasted usages and traffic count will generate forecast Cleanliness Index with help of linear model coefficient values. The forecasted Cleanliness Index is posted in FORECASTED CLEANLINESS INDEX table in Test Server Database.
-
-
-
-
-
-
-For more details about data processign architecture and complete architecture 
-vbcsaran@gmail.com
-
-
-
-
-
-
+Email: vbcsaran@gmail.com
+LinkedIN : https://www.linkedin.com/in/s-saravanakumar/
+Mobile : +91 8072920511
 
 
 
