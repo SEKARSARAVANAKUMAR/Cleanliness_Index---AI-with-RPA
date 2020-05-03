@@ -104,4 +104,4 @@ for j in range(1,pages+1):
             except:
                 print("limit Exceed (or) Data Gap")
         plt.savefig("C:\\Users\\saravanan\\Desktop\\QR_Code_"+jj+"_"+sd+".png")
-        #plt.show()
+        plt.show()
